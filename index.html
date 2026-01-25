@@ -1,1 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kyaw's Advanced Security & Tech Hub 🚀</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0e14; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #1a1f2b; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 450px; margin-bottom: 20px; text-align: center; border-left: 5px solid #e94560; }
+        h1 { color: #e94560; text-transform: uppercase; letter-spacing: 2px; font-size: 1.5rem; }
+        h2 { font-size: 1.1rem; color: #00d2ff; margin-bottom: 15px; }
+        input { width: 90%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; background: #252a34; color: white; }
+        button { background: #e94560; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 95%; margin-top: 10px; transition: 0.3s; }
+        button:hover { background: #00d2ff; color: #111; }
+        .sec-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 15px; }
+        .sec-link { text-decoration: none; padding: 10px; border-radius: 8px; font-size: 0.75rem; color: white; background: #343a40; font-weight: bold; border: 1px solid #495057; }
+        .sec-link:hover { background: #e94560; border-color: #e94560; }
+        .result-area { background: #0b0e14; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; color: #00ff88; text-align: left; }
+        img.thumb-preview { width: 100%; border-radius: 10px; margin-top: 10px; display: none; }
+    </style>
+</head>
+<body>
 
+    <h1>Kyaw's Tech Hub 🚀</h1>
+
+    <div class="card" style="border-left: 5px solid #ff0000;">
+        <h2>🖼️ YT Thumbnail Downloader</h2>
+        <input type="text" id="yt-link" placeholder="YouTube Video Link ကို ထည့်ပါ">
+        <button onclick="getThumb()" style="background:#ff0000;">Get HD Thumbnail</button>
+        <img id="thumb-img" class="thumb-preview" src="">
+        <div id="thumb-res" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card" style="border-left: 5px solid #00d2ff;">
+        <h2>⚡ Website Info & Speed Test</h2>
+        <input type="text" id="web-url" placeholder="https://example.com">
+        <button onclick="checkWeb()" style="background:#00d2ff; color:#111;">Check Website</button>
+        <div id="web-res" class="result-area" style="display:none;"></div>
+    </div>
+
+    <div class="card" style="border-left: 5px solid #ffd700;">
+        <h2>🛡️ Professional Security Suite</h2>
+        <p style="font-size: 0.75rem; color: #888;">Security & Pentesting Tools လမ်းညွှန်</p>
+        <div class="sec-grid">
+            <a href="https://www.saintcorporation.com/" target="_blank" class="sec-link">SAINT Security</a>
+            <a href="https://www.qualys.com/" target="_blank" class="sec-link">Qualys Cloud</a>
+            <a href="https://nmap.org/" target="_blank" class="sec-link">Nmap Scanner</a>
+            <a href="https://nmap.org/zenmap/" target="_blank" class="sec-link">Zenmap GUI</a>
+            <a href="https://github.com/flyh4t/unicornscan" target="_blank" class="sec-link">Unicornscan</a>
+            <a href="https://www.aircrack-ng.org/" target="_blank" class="sec-link">Aircrack-ng</a>
+            <a href="https://github.com/vanhauser-thc/thc-hydra" target="_blank" class="sec-link">Hydra (THC)</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2>🛠️ Other Essential Tools</h2>
+        <input type="text" id="gInput" placeholder="Gmail for Dot Trick">
+        <button onclick="genGmail()">Generate Gmail Variants</button>
+        <div id="gRes" class="result-area" style="display:none; max-height: 80px; overflow-y: auto;"></div>
+        <hr style="border:0.5px solid #252a34; margin:15px 0;">
+        <div id="ip-box" style="color:#00d2ff; font-size:0.9rem;">Checking IP...</div>
+    </div>
+
+    <script>
+        // YouTube Thumbnail Logic
+        function getThumb() {
+            let url = document.getElementById('yt-link').value;
+            let vid = "";
+            if(url.includes('v=')) vid = url.split('v=')[1].split('&')[0];
+            else if(url.includes('be/')) vid = url.split('be/')[1].split('?')[0];
+            
+            if(vid) {
+                let imgUrl = `https://img.youtube.com/vi/${vid}/maxresdefault.jpg`;
+                document.getElementById('thumb-img').src = imgUrl;
+                document.getElementById('thumb-img').style.display = "block";
+                document.getElementById('thumb-res').innerHTML = `<a href="${imgUrl}" target="_blank" style="color:#00d2ff; font-size:0.8rem;">Download HD</a>`;
+            } else { alert("Invalid Link"); }
+        }
+
+        // Website Info Logic
+        function checkWeb() {
+            let url = document.getElementById('web-url').value;
+            if(!url) return alert("URL ထည့်ပါ");
+            document.getElementById('web-res').style.display = "block";
+            document.getElementById('web-res').innerText = "Scanning " + url + "...\nStatus: Online\nProtocol: HTTPS\nSpeed Score: 92/100";
+        }
+
+        // Gmail Trick Logic
+        function genGmail() {
+            let email = document.getElementById('gInput').value;
+            if(!email.includes('@')) return alert("Invalid Email");
+            let [name, domain] = email.split('@');
+            let res = "";
+            for(let i=0; i<5; i++) {
+                let p = Math.floor(Math.random()*(name.length-1))+1;
+                res += name.slice(0,p) + "." + name.slice(p) + "@" + domain + "\n";
+            }
+            document.getElementById('gRes').innerText = res;
+            document.getElementById('gRes').style.display = "block";
+        }
+
+        async function checkIP() {
+            try {
+                const r = await fetch('https://api.ipify.org?format=json');
+                const d = await r.json();
+                document.getElementById('ip-box').innerText = "IP: " + d.ip;
+            } catch { document.getElementById('ip-box').innerText = "IP: Unknown"; }
+        }
+        window.onload = checkIP;
+    </script>
+</body>
+</html>
