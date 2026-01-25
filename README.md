@@ -1,15 +1,82 @@
-# 🚀 My First AI Project
-Welcome to my AI journey! I built this using Python and Gradio on my phone.
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Kyaw's Tech Hub & VPN Portal</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background: #0b0e14; color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: #1a1f2b; padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 400px; margin-bottom: 25px; text-align: center; border-left: 5px solid #e94560; }
+        input { width: 85%; padding: 12px; margin: 10px 0; border-radius: 8px; border: none; background: #252a34; color: white; }
+        button { background: #e94560; color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 90%; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: #ff4d6d; transform: translateY(-2px); }
+        .vpn-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px; }
+        .vpn-link { text-decoration: none; padding: 12px; border-radius: 8px; font-weight: bold; font-size: 0.9rem; color: white; transition: 0.3s; }
+        .vpn-link:hover { opacity: 0.8; transform: scale(1.05); }
+        #ip-box { color: #00d2ff; font-family: monospace; font-size: 1.2rem; margin: 15px 0; padding: 10px; background: #252a34; border-radius: 5px; }
+        h1 { color: #e94560; text-transform: uppercase; letter-spacing: 2px; }
+        .label { color: #888; font-size: 0.8rem; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
 
-## 📂 Projects Created
-1. **AI Shop** 🏪 (Sales Prediction)
-2. **Doctor AI** 👨‍⚕️ (Diabetes Check)
-3. **Magic Eye** 👁️ (Image Recognition)
+    <h1>Kyaw's Tech Hub 🚀</h1>
 
-## 🛠️ Tools Used
-- Python 🐍
-- Gradio 🍊
-- Hugging Face 🤗
+    <div class="card">
+        <h2>🌐 Connection Status</h2>
+        <div id="ip-box">IP: 未知 (Unknown)</div>
+        <button onclick="checkIP()">Refresh Connection Info</button>
+    </div>
 
-> Developed by kokhant9 📱
-> 
+    <div class="card">
+        <h2>🛡️ Premium & Free VPN Tools</h2>
+        <p class="label">စိတ်ချရသော VPN အပလီကေးရှင်းများ</p>
+        
+        <div class="vpn-grid">
+            <a href="https://www.expressvpn.com/" target="_blank" class="vpn-link" style="background: #e11d2b;">ExpressVPN</a>
+            
+            <a href="https://seed4.me/" target="_blank" class="vpn-link" style="background: #ffd700; color: black;">Seed4.Me</a>
+            
+            <a href="https://protonvpn.com/" target="_blank" class="vpn-link" style="background: #6d4aff;">Proton VPN</a>
+            
+            <a href="https://1.1.1.1/" target="_blank" class="vpn-link" style="background: #f48024;">Cloudflare</a>
+        </div>
+        <p style="font-size: 0.8rem; margin-top: 15px; color: #aaa;">* ExpressVPN သည် Trial သုံးရန် Account လိုအပ်နိုင်ပါသည်။</p>
+    </div>
+
+    <div class="card">
+        <h2>➕ Smart Calculator</h2>
+        <input type="number" id="num1" placeholder="First Number">
+        <input type="number" id="num2" placeholder="Second Number">
+        <button onclick="calculate()">Calculate Now</button>
+        <div id="result" style="margin-top:15px; font-weight:bold; color:#00d2ff;"></div>
+    </div>
+
+    <script>
+        async function checkIP() {
+            const ipBox = document.getElementById('ip-box');
+            ipBox.innerText = "Scanning...";
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                ipBox.innerText = "IP: " + data.ip;
+            } catch (error) {
+                ipBox.innerText = "Error: Check Internet";
+            }
+        }
+
+        function calculate() {
+            const n1 = parseFloat(document.getElementById('num1').value);
+            const n2 = parseFloat(document.getElementById('num2').value);
+            if (!isNaN(n1) && !isNaN(n2)) {
+                document.getElementById('result').innerText = "Result: " + (n1 + n2);
+            } else {
+                document.getElementById('result').innerText = "Please enter numbers";
+            }
+        }
+        
+        // စာမျက်နှာပွင့်တာနဲ့ IP ကို အလိုလိုစစ်ပေးမယ်
+        window.onload = checkIP;
+    </script>
+
+</body>
+</html>
