@@ -1,6 +1,18 @@
-<title>ကျော်ရဲ့ ပရိုဖိုင်</title> <style> body { background: linear-gradient(120deg, #84fab0 0%, #8fd3f4 100%); height: 100vh; margin: 0; display: flex; justify_content: center; align-items: center; font-family: Arial, sans-serif; } .card { background: white; padding: 40px; border-radius: 20px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.2); width: 300px; } .profile-img { width: 120px; height: 120px; border-radius: 50%; border: 5px solid #84fab0; margin-bottom: 20px; } h1 { color: #333; margin: 10px 0; } } p { color: #666; } .btn { background: #1877f2; /* Facebook အပြာရောင် */ color: white; text-decoration: none; padding: 10px 20px; border-radius: 30px; display: inline-block; margin-top: 15px; font-weight: bold; } </style>
-<div class="card">
-    <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Kyaw" class="profile-img">
-    
-    <h1>Kyaw</h1>
-    <p>🚀 AI Hobbyis
+<style>
+  img { width: 120px; border-radius: 50%; border: 5px solid #84fab0; margin-bottom: 20px; }
+  h1 { color: #333; margin: 10px 0; }
+  p { color: #666; }
+  .btn {
+    background: #1877f2; /* Facebook အပြာရောင် */
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 30px;
+    display: inline-block;
+    margin-top: 15px;
+    font-weight: bold;
+  }
+</style>
+
+<h1>Kyaw</h1>
+<p>🚀 AI Hobbyist</p>
