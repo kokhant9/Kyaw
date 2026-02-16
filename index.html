@@ -1,62 +1,99 @@
-<script>
-    // မင်းရဲ့ Local API URL (FastAPI Server)
-    const API_BASE = "http://127.0.0.1:8888";
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kyaw's Tech Hub 🚀</title>
+    <style>
+        :root { --primary: #00d2ff; --secondary: #e94560; --bg: #0b0e14; --card-bg: #1a1f2b; }
+        body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
+        .card { background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 450px; margin-bottom: 20px; border-left: 5px solid var(--secondary); }
+        h1 { color: var(--secondary); text-transform: uppercase; letter-spacing: 2px; }
+        input, textarea { width: 90%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; background: #252a34; color: white; }
+        button { background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; margin-top: 10px; }
+        button:hover { background: var(--primary); color: #111; }
+        .result-area { background: #0b0e14; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; color: #00ff88; max-height: 120px; overflow-y: auto; white-space: pre-wrap; border: 1px solid #252a34; display: none; }
+        #ip-box { color: var(--primary); font-weight: bold; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
 
-    // --- Card Checker ကို မင်းရဲ့ API နဲ့ ချိတ်မယ် ---
-    async function validateCard() {
-        const num = document.getElementById('cc-num').value;
-        const resBox = document.getElementById('stripe-res');
-        resBox.style.display = "block";
-        resBox.innerText = "🔍 Checking via Kyaw's Private API...";
+    <h1>Kyaw's Tech Hub 🚀</h1>
 
-        try {
-            // မင်းရဲ့ API ဆီကို လှမ်းမေးမယ်
-            const response = await fetch(`${API_BASE}/ask-my-ai?prompt=Check card ${num}`);
-            const data = await response.json();
-            resBox.innerText = "Response: " + data.answer;
-            resBox.style.color = "#00ff88";
-        } catch (err) {
-            resBox.innerText = "⚠️ Error: kyaw_master_api.py ကို အရင် Run ထားပါ။";
-            resBox.style.color = "yellow";
+    <div class="card" style="border-left-color: var(--primary);">
+        <div id="ip-box">Checking IP...</div>
+    </div>
+
+    <div class="card">
+        <h2>💳 Stripe Card Checker</h2>
+        <input type="text" id="cc-num" placeholder="Enter Card Number">
+        <button onclick="validateCard()">Check Status</button>
+        <div id="stripe-res" class="result-area"></div>
+    </div>
+
+    <div class="card" style="border-left-color: #00ff88;">
+        <h2>🌐 Proxy Tools</h2>
+        <button onclick="fetchProxy()" style="background:#00ff88; color:#111;">Fetch Fresh Proxies</button>
+        <div id="proxyRes" class="result-area"></div>
+    </div>
+
+    <div class="card" style="border-left-color: var(--primary);">
+        <h2>⚡ Website Info</h2>
+        <input type="text" id="web-url" placeholder="https://example.com">
+        <button onclick="checkWeb()">Scan Website</button>
+        <div id="web-res" class="result-area"></div>
+    </div>
+
+    <script>
+        const API_BASE = "http://127.0.0.1:8888";
+
+        async function validateCard() {
+            const num = document.getElementById('cc-num').value;
+            const resBox = document.getElementById('stripe-res');
+            resBox.style.display = "block";
+            resBox.innerText = "🔍 Checking via Kyaw's Private API...";
+            try {
+                const response = await fetch(`${API_BASE}/ask-my-ai?prompt=Check card ${num}`);
+                const data = await response.json();
+                resBox.innerText = "Response: " + data.answer;
+                resBox.style.color = "#00ff88";
+            } catch (err) {
+                resBox.innerText = "⚠️ Error: API Server မပွင့်သေးပါ (kyaw_master_api.py ကို Run ပါ)";
+                resBox.style.color = "yellow";
+            }
         }
-    }
 
-    // --- Proxy Fetcher ---
-    async function fetchProxy() {
-        const resBox = document.getElementById('proxyRes');
-        resBox.style.display = "block";
-        resBox.innerText = "Fetching proxies via Private API...";
-        try {
-            // Proxyscrape ဆီ တိုက်ရိုက်သွားမယ့်အစား မင်းရဲ့ API ကနေတစ်ဆင့် သွားမယ်
-            const r = await fetch('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http');
-            const d = await r.text();
-            resBox.innerText = d.substring(0, 500) + "...";
-        } catch { resBox.innerText = "Failed to fetch proxies."; }
-    }
-
-    // --- Website Checker ---
-    async function checkWeb() {
-        let url = document.getElementById('web-url').value;
-        const resBox = document.getElementById('web-res');
-        resBox.style.display = "block";
-        resBox.innerText = `🔍 System analyzing ${url}...`;
-        
-        try {
-            // မင်းရဲ့ API ဆီကနေ Website Info တောင်းမယ်
-            const r = await fetch(`${API_BASE}/ask-my-ai?prompt=Scan website ${url}`);
-            const d = await r.json();
-            resBox.innerText = d.answer;
-        } catch {
-            resBox.innerText = "Error: API connection failed.";
+        async function fetchProxy() {
+            const resBox = document.getElementById('proxyRes');
+            resBox.style.display = "block";
+            resBox.innerText = "Fetching proxies...";
+            try {
+                const r = await fetch('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http');
+                const d = await r.text();
+                resBox.innerText = d.substring(0, 500) + "...";
+            } catch { resBox.innerText = "Failed to fetch proxies."; }
         }
-    }
 
-    async function checkIP() {
-        try {
-            const r = await fetch('https://api.ipify.org?format=json');
-            const d = await r.json();
-            document.getElementById('ip-box').innerText = "IP: " + d.ip;
-        } catch { document.getElementById('ip-box').innerText = "IP: Unknown"; }
-    }
-    window.onload = checkIP;
-</script>
+        async function checkWeb() {
+            let url = document.getElementById('web-url').value;
+            const resBox = document.getElementById('web-res');
+            resBox.style.display = "block";
+            resBox.innerText = `🔍 System analyzing ${url}...`;
+            try {
+                const r = await fetch(`${API_BASE}/ask-my-ai?prompt=Scan website ${url}`);
+                const d = await r.json();
+                resBox.innerText = d.answer;
+            } catch { resBox.innerText = "Error: API connection failed."; }
+        }
+
+        async function checkIP() {
+            try {
+                const r = await fetch('https://api.ipify.org?format=json');
+                const d = await r.json();
+                document.getElementById('ip-box').innerText = "Current IP: " + d.ip;
+            } catch { document.getElementById('ip-box').innerText = "IP: Unknown"; }
+        }
+        window.onload = checkIP;
+    </script>
+</body>
+</html>
