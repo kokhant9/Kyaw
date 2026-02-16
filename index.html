@@ -1,1 +1,62 @@
+<script>
+    // မင်းရဲ့ Local API URL (FastAPI Server)
+    const API_BASE = "http://127.0.0.1:8888";
 
+    // --- Card Checker ကို မင်းရဲ့ API နဲ့ ချိတ်မယ် ---
+    async function validateCard() {
+        const num = document.getElementById('cc-num').value;
+        const resBox = document.getElementById('stripe-res');
+        resBox.style.display = "block";
+        resBox.innerText = "🔍 Checking via Kyaw's Private API...";
+
+        try {
+            // မင်းရဲ့ API ဆီကို လှမ်းမေးမယ်
+            const response = await fetch(`${API_BASE}/ask-my-ai?prompt=Check card ${num}`);
+            const data = await response.json();
+            resBox.innerText = "Response: " + data.answer;
+            resBox.style.color = "#00ff88";
+        } catch (err) {
+            resBox.innerText = "⚠️ Error: kyaw_master_api.py ကို အရင် Run ထားပါ။";
+            resBox.style.color = "yellow";
+        }
+    }
+
+    // --- Proxy Fetcher ---
+    async function fetchProxy() {
+        const resBox = document.getElementById('proxyRes');
+        resBox.style.display = "block";
+        resBox.innerText = "Fetching proxies via Private API...";
+        try {
+            // Proxyscrape ဆီ တိုက်ရိုက်သွားမယ့်အစား မင်းရဲ့ API ကနေတစ်ဆင့် သွားမယ်
+            const r = await fetch('https://api.proxyscrape.com/v2/?request=displayproxies&protocol=http');
+            const d = await r.text();
+            resBox.innerText = d.substring(0, 500) + "...";
+        } catch { resBox.innerText = "Failed to fetch proxies."; }
+    }
+
+    // --- Website Checker ---
+    async function checkWeb() {
+        let url = document.getElementById('web-url').value;
+        const resBox = document.getElementById('web-res');
+        resBox.style.display = "block";
+        resBox.innerText = `🔍 System analyzing ${url}...`;
+        
+        try {
+            // မင်းရဲ့ API ဆီကနေ Website Info တောင်းမယ်
+            const r = await fetch(`${API_BASE}/ask-my-ai?prompt=Scan website ${url}`);
+            const d = await r.json();
+            resBox.innerText = d.answer;
+        } catch {
+            resBox.innerText = "Error: API connection failed.";
+        }
+    }
+
+    async function checkIP() {
+        try {
+            const r = await fetch('https://api.ipify.org?format=json');
+            const d = await r.json();
+            document.getElementById('ip-box').innerText = "IP: " + d.ip;
+        } catch { document.getElementById('ip-box').innerText = "IP: Unknown"; }
+    }
+    window.onload = checkIP;
+</script>
