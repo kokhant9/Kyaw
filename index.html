@@ -8,12 +8,14 @@
         :root { --primary: #00d2ff; --secondary: #e94560; --bg: #0b0e14; --card-bg: #1a1f2b; }
         body { font-family: 'Inter', sans-serif; background: var(--bg); color: white; display: flex; flex-direction: column; align-items: center; padding: 20px; }
         .card { background: var(--card-bg); padding: 20px; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.5); width: 100%; max-width: 450px; margin-bottom: 20px; border-left: 5px solid var(--secondary); }
-        h1 { color: var(--secondary); text-transform: uppercase; letter-spacing: 2px; }
-        input, textarea { width: 90%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; background: #252a34; color: white; }
+        h1 { color: var(--secondary); text-transform: uppercase; letter-spacing: 2px; text-align: center; }
+        h2 { font-size: 1.1rem; color: var(--primary); margin-bottom: 10px; }
+        input, textarea { width: 92%; padding: 10px; margin: 8px 0; border-radius: 8px; border: none; background: #252a34; color: white; }
         button { background: var(--secondary); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; font-weight: bold; width: 100%; transition: 0.3s; margin-top: 10px; }
         button:hover { background: var(--primary); color: #111; }
         .result-area { background: #0b0e14; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: monospace; font-size: 0.8rem; color: #00ff88; max-height: 120px; overflow-y: auto; white-space: pre-wrap; border: 1px solid #252a34; display: none; }
-        #ip-box { color: var(--primary); font-weight: bold; margin-bottom: 10px; }
+        .grid-container { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        .sec-link { text-decoration: none; padding: 10px; border-radius: 8px; font-size: 0.8rem; color: white; text-align: center; font-weight: bold; }
     </style>
 </head>
 <body>
@@ -21,7 +23,7 @@
     <h1>Kyaw's Tech Hub 🚀</h1>
 
     <div class="card" style="border-left-color: var(--primary);">
-        <div id="ip-box">Checking IP...</div>
+        <h2 id="ip-box">Checking IP Status...</h2>
     </div>
 
     <div class="card">
@@ -32,16 +34,24 @@
     </div>
 
     <div class="card" style="border-left-color: #00ff88;">
-        <h2>🌐 Proxy Tools</h2>
+        <h2>🌐 Proxy & Combo Tools</h2>
         <button onclick="fetchProxy()" style="background:#00ff88; color:#111;">Fetch Fresh Proxies</button>
         <div id="proxyRes" class="result-area"></div>
     </div>
 
-    <div class="card" style="border-left-color: var(--primary);">
-        <h2>⚡ Website Info</h2>
+    <div class="card" style="border-left-color: #00d2ff;">
+        <h2>⚡ Website Info & Speed Test</h2>
         <input type="text" id="web-url" placeholder="https://example.com">
-        <button onclick="checkWeb()">Scan Website</button>
+        <button onclick="checkWeb()" style="background:#00d2ff; color:#111;">Scan Website</button>
         <div id="web-res" class="result-area"></div>
+    </div>
+
+    <div class="card" style="border-left-color: #6d4aff;">
+        <h2>🛡️ VPN & Network Info</h2>
+        <div class="grid-container">
+            <a href="https://protonvpn.com/" target="_blank" class="sec-link" style="background:#6d4aff;">Proton VPN</a>
+            <a href="https://1.1.1.1/" target="_blank" class="sec-link" style="background:#f48024;">Cloudflare</a>
+        </div>
     </div>
 
     <script>
@@ -56,11 +66,7 @@
                 const response = await fetch(`${API_BASE}/ask-my-ai?prompt=Check card ${num}`);
                 const data = await response.json();
                 resBox.innerText = "Response: " + data.answer;
-                resBox.style.color = "#00ff88";
-            } catch (err) {
-                resBox.innerText = "⚠️ Error: API Server မပွင့်သေးပါ (kyaw_master_api.py ကို Run ပါ)";
-                resBox.style.color = "yellow";
-            }
+            } catch { resBox.innerText = "⚠️ API Offline: Terminal မှာ API ကို Run ပါ။"; }
         }
 
         async function fetchProxy() {
@@ -78,9 +84,9 @@
             let url = document.getElementById('web-url').value;
             const resBox = document.getElementById('web-res');
             resBox.style.display = "block";
-            resBox.innerText = `🔍 System analyzing ${url}...`;
+            resBox.innerText = `🔍 Scanning ${url}...`;
             try {
-                const r = await fetch(`${API_BASE}/ask-my-ai?prompt=Scan website ${url}`);
+                const r = await fetch(`${API_BASE}/ask-my-ai?prompt=Scan ${url}`);
                 const d = await r.json();
                 resBox.innerText = d.answer;
             } catch { resBox.innerText = "Error: API connection failed."; }
