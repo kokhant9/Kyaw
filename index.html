@@ -1,1 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Cyber Dev Hub</title>
+<style>
+  :root{
+    --bg:#070b18;--card:#0f1733;--card2:#0b1228;--txt:#e6ecff;
+    --mut:#9aa7d6;--neon:#22c55e;--cyan:#22d3ee;--red:#ff5c7a;
+    --br:18px;
+  }
+  body{margin:0;background:radial-gradient(900px 500px at 20% 0%, #12224e 0%, var(--bg) 55%);
+    font-family:system-ui,Segoe UI,Arial;color:var(--txt);min-height:100vh;display:flex;justify-content:center}
+  .wrap{width:min(980px,94vw);padding:28px 0 40px}
+  .hero{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap}
+  .title{font-size:28px;font-weight:800;letter-spacing:.5px}
+  .sub{color:var(--mut);margin-top:6px}
+  .chip{display:inline-flex;align-items:center;gap:8px;background:rgba(34,211,238,.12);
+    border:1px solid rgba(34,211,238,.35);padding:8px 12px;border-radius:999px;color:var(--cyan);font-weight:700}
+  .tabs{margin-top:18px;display:flex;gap:10px;flex-wrap:wrap}
+  .tab{padding:10px 14px;border-radius:999px;border:1px solid rgba(255,255,255,.12);
+    background:rgba(255,255,255,.04);cursor:pointer;color:var(--mut);font-weight:700}
+  .tab.active{border-color:rgba(34,197,94,.7);background:rgba(34,197,94,.12);color:#bfffd3}
+  .grid{margin-top:16px;display:grid;grid-template-columns:1fr;gap:14px}
+  .card{background:linear-gradient(180deg, rgba(255,255,255,.04), rgba(255,255,255,.02));
+    border:1px solid rgba(255,255,255,.10);border-radius:var(--br);padding:18px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  input,select{flex:1;min-width:220px;background:var(--card2);border:1px solid rgba(255,255,255,.10);
+    border-radius:12px;padding:12px 12px;color:var(--txt);outline:none}
+  button{background:linear-gradient(90deg, rgba(34,197,94,.9), rgba(34,211,238,.7));
+    border:none;border-radius:12px;padding:12px 16px;font-weight:900;cursor:pointer;color:#06121b}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .out{margin-top:12px;background:var(--card2);border:1px solid rgba(255,255,255,.08);border-radius:14px;
+    padding:12px;white-space:pre-wrap}
+  .mut{color:var(--mut);font-size:13px;margin-top:8px}
+  .err{color:var(--red);font-weight:800}
+  .ok{color:var(--neon);font-weight:800}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="hero">
+    <div>
+      <div class="title">⚡ Cyber Dev Hub</div>
+      <div class="sub">Multi-tool diagnostics (Web / DNS / IP / API) • GitHub Pages UI + Cloudflare Worker backend</div>
+    </div>
+    <div class="chip" id="statusChip">● API: checking…</div>
+  </div>
 
+  <div class="tabs" id="tabs"></div>
+
+  <div class="grid">
+    <div class="card" id="panel"></div>
+  </div>
+
+  <div class="mut">Note: This tool is for educational/dev diagnostics. Some targets may rate-limit or block automated requests.</div>
+</div>
+
+<script>
+  // ✅ CHANGE THIS:
+  const WORKER_BASE = "https://YOUR-WORKER.workers.dev"; // <-- replace
+
+  const tabs = [
+    { id:"web", label:"🌐 Web" },
+    { id:"dns", label:"🧠 DNS" },
+    { id:"ip",  label:"📍 IP" },
+    { id:"api", label:"🔧 API" },
+  ];
+
+  const tabsEl = document.getElementById("tabs");
+  const panel = document.getElementById("panel");
+  const chip = document.getElementById("statusChip");
+
+  let active = "web";
+
+  function setChip(ok){
+    chip.textContent = ok ? "● API: online" : "● API: offline";
+    chip.style.color = ok ? "#22d3ee" : "#ff5c7a";
+    chip.style.borderColor = ok ? "rgba(34,211,238,.35)" : "rgba(255,92,122,.35)";
+    chip.style.background = ok ? "rgba(34,211,238,.12)" : "rgba(255,92,122,.10)";
+  }
+
+  async function ping(){
+    try{
+      const r = await fetch(WORKER_BASE + "/");
+      setChip(r.ok);
+    }catch{ setChip(false); }
+  }
+
+  function tabBtn(t){
+    const b = document.createElement("button");
+    b.className = "tab" + (t.id===active ? " active" : "");
+    b.textContent = t.label;
+    b.onclick = () => { active = t.id; render(); };
+    return b;
+  }
+
+  function htmlWeb(){
+    return `
+      <div class="row">
+        <input id="webUrl" placeholder="example.com or https://site.com" />
+        <button id="webBtn">Analyze</button>
+      </div>
+      <div class="out" id="webOut" style="display:none;"></div>
+      <div class="mut">Tip: paste any URL. Backend avoids CORS errors.</div>
+    `;
+  }
+
+  function htmlDns(){
+    return `
+      <div class="row">
+        <input id="dnsName" placeholder="example.com" />
+        <select id="dnsType">
+          <option>A</option><option>AAAA</option><option>CNAME</option><option>MX</option><option>NS</option><option>TXT</option>
+        </select>
+        <button id="dnsBtn">Lookup</button>
+      </div>
+      <div class="out" id="dnsOut" style="display:none;"></div>
+      <div class="mut">DNS is done via DNS-over-HTTPS (Cloudflare).</div>
+    `;
+  }
+
+  function htmlIp(){
+    return `
+      <div class="row">
+        <input id="ipVal" placeholder="Leave empty to check your IP (optional: 1.1.1.1)" />
+        <button id="ipBtn">Check</button>
+      </div>
+      <div class="out" id="ipOut" style="display:none;"></div>
+    `;
+  }
+
+  function htmlApi(){
+    return `
+      <div class="row">
+        <input id="apiUrl" placeholder="https://api.github.com" />
+        <select id="apiMethod">
+          <option>GET</option><option>HEAD</option><option>POST</option>
+        </select>
+        <button id="apiBtn">Send</button>
+      </div>
+      <div class="out" id="apiOut" style="display:none;"></div>
+      <div class="mut">Shows status + time + small preview.</div>
+    `;
+  }
+
+  function render(){
+    tabsEl.innerHTML = "";
+    tabs.forEach(t => tabsEl.appendChild(tabBtn(t)));
+
+    if(active==="web") panel.innerHTML = htmlWeb();
+    if(active==="dns") panel.innerHTML = htmlDns();
+    if(active==="ip")  panel.innerHTML = htmlIp();
+    if(active==="api") panel.innerHTML = htmlApi();
+
+    wire();
+    // re-mark active
+    [...tabsEl.children].forEach((b,i)=>{
+      b.classList.toggle("active", tabs[i].id===active);
+    });
+  }
+
+  function show(outEl, text, isErr=false){
+    outEl.style.display="block";
+    outEl.innerHTML = isErr ? `<span class="err">${escapeHtml(text)}</span>` : escapeHtml(text);
+  }
+
+  function escapeHtml(s){
+    return String(s).replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+  }
+
+  function fixUrl(u){
+    u = (u||"").trim();
+    if(!u) return "";
+    if(!u.startsWith("http://") && !u.startsWith("https://")) u = "https://" + u;
+    return u;
+  }
+
+  async function wire(){
+    if(active==="web"){
+      const btn = document.getElementById("webBtn");
+      const out = document.getElementById("webOut");
+      btn.onclick = async () => {
+        const raw = document.getElementById("webUrl").value;
+        const url = fixUrl(raw);
+        if(!url) return show(out, "Enter a URL", true);
+
+        btn.disabled=true;
+        show(out, "Running...");
+        try{
+          const r = await fetch(`${WORKER_BASE}/web?url=${encodeURIComponent(url)}`);
+          const d = await r.json();
+          if(!r.ok || !d.ok) return show(out, d.error || "Error", true);
+          show(out,
+`URL: ${d.input_url}
+Final: ${d.final_url}
+Status: ${d.status}
+Time: ${d.time_ms} ms
+Server: ${d.headers.server || "-"}
+Type: ${d.headers.content_type || "-"}`);
+        }catch(e){
+          show(out, String(e), true);
+        }finally{ btn.disabled=false; }
+      };
+    }
+
+    if(active==="dns"){
+      const btn = document.getElementById("dnsBtn");
+      const out = document.getElementById("dnsOut");
+      btn.onclick = async () => {
+        const name = (document.getElementById("dnsName").value||"").trim();
+        const type = document.getElementById("dnsType").value;
+        if(!name) return show(out, "Enter a domain", true);
+
+        btn.disabled=true;
+        show(out, "Running...");
+        try{
+          const r = await fetch(`${WORKER_BASE}/dns?name=${encodeURIComponent(name)}&type=${encodeURIComponent(type)}`);
+          const d = await r.json();
+          if(!r.ok || !d.ok) return show(out, d.error || "Error", true);
+
+          const lines = (d.answers||[]).map(a => `${a.data} (ttl ${a.ttl})`);
+          show(out, `DNS ${d.type} ${d.name}\n` + (lines.length? lines.join("\n") : "No answers"));
+        }catch(e){
+          show(out, String(e), true);
+        }finally{ btn.disabled=false; }
+      };
+    }
+
+    if(active==="ip"){
+      const btn = document.getElementById("ipBtn");
+      const out = document.getElementById("ipOut");
+      btn.onclick = async () => {
+        const ip = (document.getElementById("ipVal").value||"").trim();
+        btn.disabled=true;
+        show(out, "Running...");
+        try{
+          const u = ip ? `${WORKER_BASE}/ip?ip=${encodeURIComponent(ip)}` : `${WORKER_BASE}/ip`;
+          const r = await fetch(u);
+          const d = await r.json();
+          if(!r.ok || !d.ok) return show(out, d.error || "Error", true);
+
+          show(out,
+`IP: ${d.ip}
+Country: ${d.country || "-"}
+City: ${d.city || "-"}
+ISP: ${d.isp || "-"}
+ASN: ${d.asn || "-"}`);
+        }catch(e){
+          show(out, String(e), true);
+        }finally{ btn.disabled=false; }
+      };
+    }
+
+    if(active==="api"){
+      const btn = document.getElementById("apiBtn");
+      const out = document.getElementById("apiOut");
+      btn.onclick = async () => {
+        const raw = document.getElementById("apiUrl").value;
+        const url = fixUrl(raw);
+        const method = document.getElementById("apiMethod").value;
+        if(!url) return show(out, "Enter an API URL", true);
+
+        btn.disabled=true;
+        show(out, "Running...");
+        try{
+          const r = await fetch(`${WORKER_BASE}/api?url=${encodeURIComponent(url)}&method=${encodeURIComponent(method)}`);
+          const d = await r.json();
+          if(!r.ok || !d.ok) return show(out, d.error || "Error", true);
+
+          show(out,
+`URL: ${d.url}
+Method: ${d.method}
+Status: ${d.status}
+Time: ${d.time_ms} ms
+Type: ${d.content_type || "-"}\n
+Preview:\n${d.preview || ""}`);
+        }catch(e){
+          show(out, String(e), true);
+        }finally{ btn.disabled=false; }
+      };
+    }
+  }
+
+  ping();
+  render();
+</script>
+</body>
+</html>
