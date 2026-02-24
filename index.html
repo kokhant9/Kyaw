@@ -1,1 +1,81 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Dev Web Analyzer</title>
+<style>
+  body{background:#0f172a;font-family:Arial;color:#fff;text-align:center;padding:40px}
+  .container{max-width:520px;margin:auto;background:#1e293b;padding:28px;border-radius:14px}
+  input{width:92%;padding:12px;margin:12px 0;border-radius:10px;border:none;outline:none}
+  button{padding:12px 22px;background:#22c55e;border:none;border-radius:10px;cursor:pointer;font-weight:bold}
+  button:disabled{opacity:.6;cursor:not-allowed}
+  .result{margin-top:18px;text-align:left;background:#0b1220;padding:14px;border-radius:12px}
+  .row{margin:8px 0}
+  .muted{opacity:.85;font-size:14px}
+  .err{color:#ff6b6b}
+</style>
+</head>
 
+<body>
+  <div class="container">
+    <h2>🌐 Dev Web Analyzer</h2>
+    <div class="muted">Paste URL → Analyze → See result (simple & clean)</div>
+
+    <input id="urlInput" placeholder="example.com" />
+    <br />
+    <button id="btn" onclick="analyze()">Analyze</button>
+
+    <div class="result" id="result" style="display:none;"></div>
+  </div>
+
+<script>
+function fixUrl(u){
+  u = (u || "").trim();
+  if(!u) return "";
+  if(!u.startsWith("http://") && !u.startsWith("https://")){
+    u = "https://" + u;
+  }
+  return u;
+}
+
+async function analyze(){
+  const btn = document.getElementById("btn");
+  const box = document.getElementById("result");
+  let url = fixUrl(document.getElementById("urlInput").value);
+
+  if(!url){
+    box.style.display="block";
+    box.innerHTML = `<div class="err">Please enter a URL.</div>`;
+    return;
+  }
+
+  btn.disabled = true;
+  box.style.display="block";
+  box.innerHTML = "Analyzing...";
+
+  try{
+    const start = performance.now();
+    const res = await fetch(url, { method:"GET" });
+    const end = performance.now();
+
+    const ct = res.headers.get("content-type") || "-";
+    box.innerHTML = `
+      <div class="row"><b>URL:</b> ${url}</div>
+      <div class="row"><b>Status:</b> ${res.status}</div>
+      <div class="row"><b>Response Time:</b> ${((end-start)/1000).toFixed(2)} sec</div>
+      <div class="row"><b>Content-Type:</b> ${ct}</div>
+      <div class="muted">Note: Some sites block browser requests (CORS).</div>
+    `;
+  }catch(e){
+    box.innerHTML = `
+      <div class="err"><b>Error:</b> Cannot fetch this site (likely CORS blocked).</div>
+      <div class="muted">Fix: To get status for all sites, you need a small backend proxy (serverless).</div>
+    `;
+  }finally{
+    btn.disabled = false;
+  }
+}
+</script>
+</body>
+</html>
